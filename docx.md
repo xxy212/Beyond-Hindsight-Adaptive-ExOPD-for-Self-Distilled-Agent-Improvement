@@ -13,11 +13,11 @@
 
 这篇把上面的思想推进到了 **agent RL**。它不是简单依赖最终 reward，而是把 `s_{t+1}` 里的信息抽成一个 **hint**，构造 enhanced teacher context，然后定义 token-level OPD advantage：
 
-[
 
+$
 A_t = \log \pi_{\text{teacher}}(a_t|s_{\text{enhanced}}) - \log \pi_\theta(a_t|s_t).
+$
 
-]
 
 同时，它还把这种 OPD advantage 和 binary/verifiable reward 组合成加权优势：
 
