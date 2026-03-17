@@ -47,7 +47,6 @@ $$
 这篇是把 OPD 从“模仿 teacher”提升成“**可控地超越 teacher**”。它先把 OPD重写成一个 KL-constrained RL 目标，再引入第三个 reference model `π_ref` 和 reward scaling factor `λ`，得到 G-OPD：
 
 $$
-
 J_{\text{G-OPD}}(\theta)=\mathbb{E}\left[\lambda \log \frac{\pi^*(y|x)}{\pi_{ref}(y|x)} - D_{KL}(\pi_\theta || \pi_{ref})\right].
 $$
 
