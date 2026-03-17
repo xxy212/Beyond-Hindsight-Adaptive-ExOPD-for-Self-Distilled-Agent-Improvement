@@ -14,18 +14,17 @@
 这篇把上面的思想推进到了 **agent RL**。它不是简单依赖最终 reward，而是把 `s_{t+1}` 里的信息抽成一个 **hint**，构造 enhanced teacher context，然后定义 token-level OPD advantage：
 
 
-$
+$$
 A_t = \log \pi_{\text{teacher}}(a_t|s_{\text{enhanced}}) - \log \pi_\theta(a_t|s_t).
-$
+$$
 
 
 同时，它还把这种 OPD advantage 和 binary/verifiable reward 组合成加权优势：
 
-[
-
+$$
 A_t = w_{\text{binary}} r_{\text{final}} + w_{\text{opd}}(\log \pi_{\text{teacher}}(a_t|s_{\text{enhanced}})-\log \pi_\theta(a_t|s_t)).
+$$
 
-]
 
 作者明确说 binary RL 提供 broad coverage，OPD 提供 high-resolution per-token correction。
 
@@ -47,11 +46,10 @@ A_t = w_{\text{binary}} r_{\text{final}} + w_{\text{opd}}(\log \pi_{\text{teache
 
 这篇是把 OPD 从“模仿 teacher”提升成“**可控地超越 teacher**”。它先把 OPD重写成一个 KL-constrained RL 目标，再引入第三个 reference model `π_ref` 和 reward scaling factor `λ`，得到 G-OPD：
 
-[
+$$
 
 J_{\text{G-OPD}}(\theta)=\mathbb{E}\left[\lambda \log \frac{\pi^*(y|x)}{\pi_{ref}(y|x)} - D_{KL}(\pi_\theta || \pi_{ref})\right].
-
-]
+$$
 
 论文明确说 `λ` 控制 reward 与 KL 的相对权重；并指出当 `λ>1` 时，就是 **reward extrapolation / ExOPD**。此外，在 strong-to-weak distillation 里，他们又进一步讨论 **reward correction**：当 reference 选成 teacher 的 pre-RL variant 一类更合适的模型时，效果还能继续提升。
 
@@ -143,11 +141,9 @@ J_{\text{G-OPD}}(\theta)=\mathbb{E}\left[\lambda \log \frac{\pi^*(y|x)}{\pi_{ref
 
 设智能体在状态 (s_t) 下产生动作或回答 (a_t)，环境返回下一状态 (s_{t+1})。系统从 ((a_t, s_{t+1})) 中抽取一个后见提示 (h_t)，并构造增强状态：
 
-[
-
+$$
 s_t^+ = s_t \oplus h_t
-
-]
+$$
 
 其中，(\oplus) 表示将提示拼接至原始状态上下文。
 
@@ -155,38 +151,38 @@ s_t^+ = s_t \oplus h_t
 
 - 原始条件下的 student 分布：
     
-    [
+    $$
     
     \log \pi_\theta(a_t \mid s_t)
     
-    ]
+    $$
     
 - 带有后见提示条件下的 self-teacher 分布：
     
-    [
+    $$
     
     \log \pi_\theta(a_t \mid s_t^+)
     
-    ]
+    $$
     
 
 据此，可定义基础自蒸馏优势信号为：
 
-[
+$$
 
 A_t^{self} = \log \pi_\theta(a_t \mid s_t^+) - \log \pi_\theta(a_t \mid s_t)
 
-]
+$$
 
 这一直观地表示：若原动作中的某些 token 在后见提示条件下被模型赋予更高概率，则说明这些 token 与修正后的意图更一致，反之则应被削弱。
 
 为探索“超过自教师”而非“仅模仿自教师”，本文进一步引入外推式蒸馏。设 (\pi_{ref}) 为参考策略，可取初始策略、前一轮策略或滑动平均策略，则构造外推目标：
 
-[
+$$
 
 A_t^{exo} = \lambda \cdot \log \pi_\theta(a_t \mid s_t^+) - \log \pi_{ref}(a_t \mid s_t)
 
-]
+$$
 
 其中 (\lambda > 1) 为外推系数。
 
